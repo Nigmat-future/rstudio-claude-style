@@ -1,0 +1,18 @@
+# Local R sessions, project state and credentials do not belong in a theme repository.
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+.Renviron
+.env
+.env.*
+!.env.example
+.posit/
+.codex/
+node_modules/
+demo-output/
+*.before-windows-hook-fix
+*.tmp
+*.log
+.DS_Store
+Thumbs.db

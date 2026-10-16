@@ -1,0 +1,198 @@
+diff --git a/docs/user/rstudio/ide/guide/ui/appearance.qmd b/docs/user/rstudio/ide/guide/ui/appearance.qmd
+index 877b663..a3204e2 100644
+--- a/docs/user/rstudio/ide/guide/ui/appearance.qmd
++++ b/docs/user/rstudio/ide/guide/ui/appearance.qmd
+@@ -83,6 +83,37 @@ In addition to these rule sets, you will also find a number of rule sets related
+ 
+ Since an rstheme is just CSS, anything that you can do with CSS you can do in an rstheme.
+ 
++### Pane headers and toolbars
++
++The following `rstheme_` classes identify pane surfaces without depending on
++GWT-generated class names or the order of children in the DOM:
++
++| Class | Surface |
++| --- | --- |
++| `.rstheme_primaryWindowFrameHeader` | The title strip used by primary windows, including the Console when shown without tabs. |
++| `.rstheme_toolbar` | The table containing a toolbar's controls, inside `.rstheme_toolbarWrapper`. |
++| `.rstheme_windowFrameHeader` | The layout container holding a pane's header, including tabbed headers. |
++| `.rstheme_windowFrameContent` | The layout container holding a pane's main or full-size content. |
++
++These classes are added alongside the built-in styles. They do not change the
++default appearance. For example, add this to a dark rstheme to recolor the
++header and toolbar surfaces in Modern or Sky:
++
++```css
++.rstudio-themes-flat .rstheme_primaryWindowFrameHeader,
++.rstudio-themes-flat .rstheme_toolbar,
++.rstudio-themes-flat .rstheme_windowFrameHeader,
++.rstudio-themes-flat .rstheme_windowFrameContent {
++  background-color: #242421 !important;
++  border-color: #4a453c !important;
++}
++```
++
++Keep overrides to colors and borders. Changing sizes, positioning, overflow,
++pointer events, or focus styles can hide controls or interfere with resizing
++and keyboard navigation. These hooks do not style the operating system's
++title bar or the contents of embedded frames, such as Posit Assistant.
++
+ ## Testing changes to a theme
+ 
+ If you're modifying a theme which has already been added to RStudio, you may need to restart RStudio desktop in order to make the changes take effect.
+diff --git a/src/gwt/src/org/rstudio/core/client/theme/PrimaryWindowFrame.java b/src/gwt/src/org/rstudio/core/client/theme/PrimaryWindowFrame.java
+index 0fcfe68..facb87c 100644
+--- a/src/gwt/src/org/rstudio/core/client/theme/PrimaryWindowFrame.java
++++ b/src/gwt/src/org/rstudio/core/client/theme/PrimaryWindowFrame.java
+@@ -49,6 +49,7 @@ public class PrimaryWindowFrame extends WindowFrame
+ 
+       panel_ = new ClickFlowPanel();
+       panel_.setStylePrimaryName(styles.primaryWindowFrameHeader());
++      panel_.addStyleName("rstheme_primaryWindowFrameHeader");
+ 
+       title_ = new Label(title);
+       title_.setStylePrimaryName(styles.title());
+diff --git a/src/gwt/src/org/rstudio/core/client/theme/WindowFrame.java b/src/gwt/src/org/rstudio/core/client/theme/WindowFrame.java
+index 2136241..190403e 100644
+--- a/src/gwt/src/org/rstudio/core/client/theme/WindowFrame.java
++++ b/src/gwt/src/org/rstudio/core/client/theme/WindowFrame.java
+@@ -281,6 +281,7 @@ public class WindowFrame extends Composite
+          main_.addStyleName(styles.windowFrameWidget());
+ 
+          frame_.add(main_);
++         frame_.getWidgetContainerElement(main_).addClassName("rstheme_windowFrameContent");
+          frame_.setWidgetLeftRight(
+                main_,
+                LEFT_SHADOW_WIDTH, Style.Unit.PX,
+@@ -311,6 +312,7 @@ public class WindowFrame extends Composite
+       if (header_ != null)
+       {
+          frame_.add(header_);
++         frame_.getWidgetContainerElement(header_).addClassName("rstheme_windowFrameHeader");
+          frame_.setWidgetLeftRight(
+                header_,
+                LEFT_SHADOW_WIDTH, Style.Unit.PX,
+@@ -369,6 +371,7 @@ public class WindowFrame extends Composite
+          }
+ 
+          frame_.add(fill_);
++         frame_.getWidgetContainerElement(fill_).addClassName("rstheme_windowFrameContent");
+          frame_.setWidgetLeftRight(fill_,
+                LEFT_SHADOW_WIDTH, Style.Unit.PX,
+                RIGHT_SHADOW_WIDTH, Style.Unit.PX);
+diff --git a/src/gwt/src/org/rstudio/core/client/theme/res/themeStyles.css b/src/gwt/src/org/rstudio/core/client/theme/res/themeStyles.css
+index 49dc905..678d785 100644
+--- a/src/gwt/src/org/rstudio/core/client/theme/res/themeStyles.css
++++ b/src/gwt/src/org/rstudio/core/client/theme/res/themeStyles.css
+@@ -50,6 +50,8 @@
+ @external rstheme_secondaryToolbar;
+ @external rstheme_minimizedWindowObject;
+ @external rstheme_center;
++@external rstheme_primaryWindowFrameHeader, rstheme_toolbar;
++@external rstheme_windowFrameHeader, rstheme_windowFrameContent;
+ 
+ @external windowframe, windowframe-maximized, windowframe-exclusive;
+ 
+diff --git a/src/gwt/src/org/rstudio/core/client/widget/Toolbar.java b/src/gwt/src/org/rstudio/core/client/widget/Toolbar.java
+index 6ca0a8f..7a926ec 100644
+--- a/src/gwt/src/org/rstudio/core/client/widget/Toolbar.java
++++ b/src/gwt/src/org/rstudio/core/client/widget/Toolbar.java
+@@ -239,6 +239,7 @@ public class Toolbar extends ResizeComposite implements HasResizeHandlers
+                                           HasHorizontalAlignment.ALIGN_RIGHT);
+ 
+       horizontalPanel_.addStyleName(styles_.toolbar());
++      horizontalPanel_.addStyleName("rstheme_toolbar");
+ 
+       toolbarWrapper_.add(horizontalPanel_);
+       initWidget(toolbarWrapper_);
+diff --git a/e2e/rstudio/tests/panes/theme_hooks.test.ts b/e2e/rstudio/tests/panes/theme_hooks.test.ts
+new file mode 100644
+index 0000000..b5e79b9
+--- /dev/null
++++ b/e2e/rstudio/tests/panes/theme_hooks.test.ts
+@@ -0,0 +1,85 @@
++import { test, expect } from '@fixtures/rstudio.fixture';
++import { executeInConsole } from '@pages/console_pane.page';
++import { clearPref, getPref, setPref } from '@utils/commands';
++import {
++  ACE_THEME_LINK, DARK_THEME, DARK_THEME_HREF, LIGHT_THEME, LIGHT_THEME_HREF, expectThemeStylesheet,
++} from '@utils/theme';
++import type { Locator } from '@playwright/test';
++
++const STYLE_ID = 'rstudio-theme-hooks-test';
++const PREFS = ['editor_theme', 'show_terminal_tab', 'jobs_tab_visibility', 'show_launcher_jobs_tab'] as const;
++
++function appearance(target: Locator) {
++  return target.evaluate(element => {
++    const style = getComputedStyle(element);
++    const { x, y, width, height } = element.getBoundingClientRect();
++    return {
++      backgroundColor: style.backgroundColor,
++      color: style.color,
++      bounds: { x, y, width, height },
++    };
++  });
++}
++
++test('public theme hooks recolor real IDE chrome without changing its layout', async ({ rstudioPage: page }) => {
++  // Given a Console-only pane, whose primary title bar is attached to the DOM.
++  const savedPrefs = await Promise.all(PREFS.map(async name => ({ name, value: await getPref(page, name) })));
++  try {
++    await setPref(page, 'show_terminal_tab', false);
++    await setPref(page, 'jobs_tab_visibility', 'closed');
++    await setPref(page, 'show_launcher_jobs_tab', false);
++    await page.reload();
++    await page.waitForFunction(() => window.rstudio?.ready === true);
++
++    const consoleFrame = page.locator('.windowframe').filter({ has: page.locator('#rstudio_console_input') });
++    const title = consoleFrame.locator('.rstheme_windowFrameHeader .rstheme_primaryWindowFrameHeader');
++    const content = consoleFrame.locator('.rstheme_windowFrameContent').filter({ has: page.locator('#rstudio_console_input') });
++    const toolbar = page.locator('.rstheme_toolbarWrapper table.rstheme_toolbar:visible').first();
++    const targets = [title, toolbar] as const;
++
++    for (const [theme, href] of [[LIGHT_THEME, LIGHT_THEME_HREF], [DARK_THEME, DARK_THEME_HREF]] as const) {
++      await executeInConsole(page, `.rs.api.applyTheme(${JSON.stringify(theme)})`, { wait: true });
++      await expectThemeStylesheet(page, href);
++      await expect.poll(() => page.locator(ACE_THEME_LINK).evaluate(
++        element => element instanceof HTMLLinkElement && element.sheet !== null,
++      ), { timeout: 15000 }).toBe(true);
++      await expect(content).toBeVisible();
++      for (const target of targets)
++        await expect(target).toBeVisible();
++      const before = await Promise.all(targets.map(appearance));
++      for (const value of before)
++        expect(value.backgroundColor).not.toBe('rgb(17, 34, 51)');
++
++      // When a theme author overrides only colors through the public classes.
++      await page.evaluate(id => {
++        const style = document.createElement('style');
++        style.id = id;
++        style.textContent = `.rstheme_primaryWindowFrameHeader, .rstheme_toolbar {
++          background-color: rgb(17, 34, 51) !important;
++          color: rgb(221, 238, 255) !important;
++        }`;
++        document.head.append(style);
++      }, STYLE_ID);
++
++      // Then colors change, geometry stays fixed, and removing CSS restores both.
++      await expect.poll(() => Promise.all(targets.map(appearance))).toEqual(before.map(value => ({
++        ...value, backgroundColor: 'rgb(17, 34, 51)', color: 'rgb(221, 238, 255)',
++      })));
++      await page.locator(`#${STYLE_ID}`).evaluate(element => element.remove());
++      await expect.poll(() => Promise.all(targets.map(appearance))).toEqual(before);
++    }
++  } finally {
++    try {
++      await page.locator(`#${STYLE_ID}`).evaluateAll(elements => elements.forEach(element => element.remove()));
++    } finally {
++      for (const { name, value } of savedPrefs) {
++        if (value === null)
++          await clearPref(page, name);
++        else
++          await setPref(page, name, value);
++      }
++      await page.reload();
++      await page.waitForFunction(() => window.rstudio?.ready === true);
++    }
++  }
++});

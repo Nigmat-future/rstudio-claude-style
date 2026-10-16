@@ -1,0 +1,34 @@
+RStudio Claude Style
+Community modifications and workflow materials, 2026, Nigmat Rahim.
+Distributed under the GNU Affero General Public License, version 3.
+See LICENSE for the complete license text.
+
+Theme provenance
+----------------
+The .rstheme files under themes/ and theme-support/ are modified versions of
+Tomorrow Night Bright shipped with RStudio 2026.09.0+174.
+Upstream: https://github.com/rstudio/rstudio
+Original theme: src/cpp/session/resources/themes/tomorrow_night_bright.rstheme
+Matching RStudio source revision: 870df5ed7859c758db7aed6f510a3edca3c74bd7
+Source: https://github.com/rstudio/rstudio/blob/870df5ed7859c758db7aed6f510a3edca3c74bd7/src/cpp/session/resources/themes/tomorrow_night_bright.rstheme
+RStudio copyright: Posit Software, PBC; distributed under AGPL version 3.
+The modifications change colors and add IDE surface selectors. They do not
+include the RStudio application or any compiled application resources.
+
+The experimental patch under theme-support/ targets RStudio source revision
+9c11fb25c2a24c4faa09f79befb1907dc8a825de. It is an unmerged community proposal.
+It contains source changes, theme documentation, and an end-to-end test.
+
+Compatibility tools
+-------------------
+fix-codex-hook.mjs and check-codex-hooks.mjs describe and verify a local
+compatibility change for Posit Assistant 1.8.0 with Codex 0.154.0 on Windows.
+Small exact-match strings identify the installed adapter. No complete Posit
+Assistant bundle, engine binary, credentials, or vendor license is included.
+Those applications remain subject to their own licenses and service terms.
+
+Names and trademarks
+--------------------
+RStudio, Posit Assistant, Claude, Claude Code, Anthropic, Codex and OpenAI are
+names of their respective owners. This repository is an independent community
+project and is not endorsed by or affiliated with those owners.
