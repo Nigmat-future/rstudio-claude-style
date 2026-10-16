@@ -2,56 +2,45 @@
 
 # RStudio Claude Style
 
-### Your R workflow. A warmer workspace.
+### Claude Code-inspired themes and focused AI workflows for RStudio.
 
-Claude-inspired charcoal themes and focused AI workflows, right inside RStudio.
+Warm charcoal. Softer contrast. Your code, data, and plots in one workspace.
 
-[![License: AGPL v3](https://img.shields.io/badge/license-AGPL_v3-d97757?style=flat-square&labelColor=242421)](LICENSE) [![RStudio themes](https://img.shields.io/badge/RStudio-native_themes-a6b88a?style=flat-square&labelColor=242421)](#quick-start) [![Posit Assistant skills](https://img.shields.io/badge/Posit_Assistant-2_skills-8fafc1?style=flat-square&labelColor=242421)](#put-the-skills-to-work)
+[![License: AGPL v3](https://img.shields.io/badge/license-AGPL_v3-d97757?style=flat-square&labelColor=242421)](LICENSE) [![GitHub stars](https://img.shields.io/github/stars/Nigmat-future/rstudio-claude-style?style=flat-square&color=a6b88a&labelColor=242421)](https://github.com/Nigmat-future/rstudio-claude-style/stargazers) [![Last commit](https://img.shields.io/github/last-commit/Nigmat-future/rstudio-claude-style?style=flat-square&color=8fafc1&labelColor=242421)](https://github.com/Nigmat-future/rstudio-claude-style/commits/main/)
 
-[Get started](#quick-start) · [Try the skills](#put-the-skills-to-work) · [Compatibility](#tested-environment) · [Report an issue](https://github.com/Nigmat-future/rstudio-claude-style/issues)
+[Install the theme](#quick-start) · [Add AI workflows](#ai-workflows-in-posit-assistant) · [Compatibility](#tested-environment) · [Report an issue](https://github.com/Nigmat-future/rstudio-claude-style/issues)
 
 <img src="assets/rstudio-claude-style.jpg" alt="Real RStudio with Claude Terminal Charcoal: R code, public iris data, a dark scatter plot, and species counts in the Console." width="100%">
 
-<sub>Real RStudio. Public iris data. A clean, isolated demo session with no personal code or chat history.</sub>
+<sub>Claude Terminal Charcoal in a real RStudio session. Public iris data; no personal code or chat history.</sub>
 
 </div>
 
-<br>
+Two native RStudio themes and two optional Posit Assistant skills. Give your editor a warmer palette, review selected R code, and turn real data into reproducible figures.
 
-**Keep the IDE you know. Give it a workspace you want to open.**
-
-Warm charcoal surfaces, soft ivory text, and terracotta accents bring a Claude Code-inspired feel to RStudio. Two native Posit Assistant skills help you move from a selected block of code to a checked result, or from a real R object to an exported figure.
-
-The screenshot shows the theme, not an AI conversation. Its plot colors are set by the [demo script](examples/theme-preview.R); the theme does not automatically recolor your plots.
-
-## Three pieces. Use the ones you need.
-
-| The look | The code workflow | The plotting workflow |
-| :--- | :--- | :--- |
-| **Claude Terminal Charcoal** | **`/r-code`** | **`/r-plot`** |
-| A warm dark editor, Console, Terminal, and selected IDE surfaces. | Start with your selection. Explain, diagnose, make a focused change, and check it. | Inspect real data, draw the figure, review it, and preserve the script plus PNG/PDF. |
-
-Themes are static `.rstheme` files. Skills use Posit Assistant's existing tools. The basic setup adds no background service or R package dependency.
-
-> This is an independent community project. “Claude style” describes the appearance and workflow; AI comes from your own Posit Assistant setup and configured model. It is not a Claude Code port or an official Anthropic, OpenAI, or Posit product.
+The preview shows the theme. Plot colors come from the [demo script](examples/theme-preview.R); installing a theme does not recolor your plots.
 
 ## Quick start
 
-[Download the ZIP](https://github.com/Nigmat-future/rstudio-claude-style/archive/refs/heads/main.zip), or clone the repository:
+**Requires RStudio.** The theme works on its own; AI workflows additionally require a working Posit Assistant setup and configured model.
+
+[Download and extract the ZIP](https://github.com/Nigmat-future/rstudio-claude-style/archive/refs/heads/main.zip), or clone:
 
 ```sh
 git clone https://github.com/Nigmat-future/rstudio-claude-style.git
 cd rstudio-claude-style
 ```
 
-### 1. Set the mood
-
 In **Tools > Global Options > Appearance**:
 
-1. Note your current global and editor themes so you can switch back.
-2. Click **Add…** and select `themes/claude-terminal-charcoal.rstheme`.
-3. Set **RStudio theme** to **Modern** and **Editor theme** to **Claude Terminal Charcoal**.
-4. Click **Apply / OK**.
+1. Note your current themes, then click **Add…** and select `themes/claude-terminal-charcoal.rstheme`.
+2. Set **RStudio theme** to **Modern** and **Editor theme** to **Claude Terminal Charcoal**.
+3. Click **Apply / OK**.
+
+Prefer the original palette? Import [`themes/claude-terminal.rstheme`](themes/claude-terminal.rstheme) instead. Switch back in Appearance whenever you like.
+
+<details>
+<summary><strong>Install from the RStudio Console</strong></summary>
 
 Already have `rstudioapi` installed? Run this in the RStudio Console from the repository root:
 
@@ -59,9 +48,24 @@ Already have `rstudioapi` installed? Run this in the RStudio Console from the re
 rstudioapi::addTheme("themes/claude-terminal-charcoal.rstheme", apply = TRUE)
 ```
 
-Existing themes are not overwritten by default. The earlier `themes/claude-terminal.rstheme` is also included if you want to compare the two.
+Existing themes are not overwritten by default. See [`rstudioapi::addTheme()`](https://rstudio.github.io/rstudioapi/reference/addTheme.html).
 
-### 2. Add the skills
+</details>
+
+**Like the look? [Star the project](https://github.com/Nigmat-future/rstudio-claude-style) to help other R users find it.**
+
+## Why this setup
+
+- **Keep your RStudio workflow.** Warm charcoal, ivory text, and terracotta accents across the editor, Console, Terminal, and selected IDE surfaces.
+- **Get help with the code you selected.** `/r-code` guides explanation, diagnosis, focused edits, and a small runnable check.
+- **Keep the figure and the code behind it.** `/r-plot` guides data inspection, plotting, visual review, and R script plus PNG/PDF export.
+- **Start with the parts you need.** Themes are static `.rstheme` files; skills use Assistant's existing tools. The basic setup adds no background service or R package dependency.
+
+## AI workflows in Posit Assistant
+
+These skills are instructions for **Posit Assistant inside RStudio**. They use its existing editor, R-session, and plotting tools; available actions depend on your model, mode, and permissions. The skill definitions are currently in Chinese; the prompts below are in English.
+
+### Install the skills
 
 Copy the `skills/r-code` and `skills/r-plot` folders into:
 
@@ -91,7 +95,7 @@ If the commands do not appear, check the folder structure and your `skills.paths
 
 </details>
 
-## Put the skills to work
+### Try a prompt
 
 Select code in the editor, press **Ctrl+Shift+I** to open the sidebar on the tested Windows setup, and choose a model you have configured.
 
@@ -111,9 +115,9 @@ Review the figure, then save the R script and PNG/PDF in a new directory.
 Do not overwrite existing files.
 ```
 
-These are workflow instructions, not new execution tools. Results depend on the model and the editor, R-session, and plotting tools available to Assistant. Existing permissions still apply. The included skill definitions are currently written in Chinese; the examples above are English prompts.
+> Independent community project. “Claude style” describes the appearance and workflow. This is not a Claude Code port or an official Anthropic, OpenAI, or Posit product. Bring your own model access; no account, subscription, or API credit is included.
 
-## See it with your own data
+## Reproduce the preview
 
 To reproduce the screenshot's public demo, open and source [`examples/theme-preview.R`](examples/theme-preview.R) inside RStudio. It uses only base R and the built-in `iris` dataset. It changes graphics settings in the current session to match the theme.
 
@@ -130,12 +134,14 @@ source("examples/plot-demo.R")
 plot_demo("demo-output")
 ```
 
-Choose an output directory without existing files of the same name. The command-line version checks 150 observations, three groups of 50, zero excluded NA rows, successful exports, closed graphics devices, and refusal to overwrite existing results. `source()` defines the function without running those command-line checks.
+Choose an output directory without existing files of the same name. `source()` defines the function; the command-line version also runs the checks described below.
 
 <details>
-<summary><strong>View the export example</strong></summary>
+<summary><strong>View the export and its checks</strong></summary>
 
 ![Base R iris scatter plot with species distinguished by color and shape](examples/output/iris-sepal.png)
+
+The command-line example checks 150 observations, three groups of 50, zero excluded NA rows, successful PNG/PDF exports, closed graphics devices, and refusal to overwrite existing results.
 
 </details>
 
@@ -151,8 +157,6 @@ Choose an output directory without existing files of the same name. The command-
 | Node.js — optional compatibility tools only | `22.23.1` |
 
 Other versions and operating systems have not been verified. Some IDE selectors depend on the tested RStudio build and may change after an update. Native windows, the OS title bar, and the contents of the Assistant iframe retain their own styling. Layout, font sizes, shortcuts, and permissions are unchanged by the theme.
-
-Bring your own working Assistant and model access. No account, model, subscription, or API credit is included.
 
 ## Optional Windows compatibility fix
 
@@ -196,11 +200,11 @@ The initial release checks on **2026-10-16** passed the isolated patcher tests, 
 
 The experimental [`theme-support/`](theme-support/README.md) directory contains a proposed RStudio source patch and a theme that depends on new hooks. **Use `themes/` for normal installation.** “Stable” in the experimental filename does not mean those hooks are available in official builds. A complete patched IDE build and live end-to-end run remain unverified.
 
-## Make it better
+## Contributing and support
 
 Found a surface that needs attention? [Open an issue](https://github.com/Nigmat-future/rstudio-claude-style/issues) with your OS, RStudio / Assistant / Codex versions, and a small reproduction. Remove private data from screenshots and logs.
 
-Theme refinements, compatibility reports, and focused workflow improvements are welcome. Run the relevant checks before submitting a change. If this makes your daily R work more pleasant, a star helps others find it.
+Theme refinements, compatibility reports, and focused workflow improvements are welcome. Run the relevant checks before submitting a pull request.
 
 ---
 
