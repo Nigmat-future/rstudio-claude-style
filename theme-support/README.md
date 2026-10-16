@@ -1,38 +1,36 @@
-# 实验候选：RStudio 公开主题接口
+# Experimental: public RStudio theme hooks
 
-此目录供研究和上游讨论使用。普通用户请安装仓库根目录 `themes/` 下的主题。
+This directory is for source-level research and upstream discussion. For normal installation, use the themes in the repository's `themes/` directory.
 
-`Stable` 表示示例尝试使用公开接口的设计，**不表示当前官方 RStudio 已提供这些新增接口**。未应用源码补丁时，不要用该文件替换已安装的 Claude Terminal Charcoal。完整 IDE 构建和带补丁 IDE 的端到端运行尚未完成。
+**The new hooks are not available in an unpatched official RStudio build.** “Stable” describes the example's intended use of public selectors, not released compatibility. Do not replace Claude Terminal Charcoal with this example unless you have built RStudio with the patch. A complete patched IDE build and live end-to-end run remain unverified.
 
-## 内容与基准
+## Contents and baseline
 
-- `rstudio-theme-hooks.patch`：增加主题类名、文档和一个实际 IDE 端到端测试。
-- `claude-terminal-charcoal-stable.rstheme`：通过新增类定位对应表面，去除当前主题针对这些表面的编译类名及首尾子节点定位。
-- 基准：[rstudio/rstudio @ 9c11fb25c2a24c4faa09f79befb1907dc8a825de](https://github.com/rstudio/rstudio/tree/9c11fb25c2a24c4faa09f79befb1907dc8a825de)。
+- `rstudio-theme-hooks.patch`: new theme classes, documentation, and a real-IDE end-to-end test.
+- `claude-terminal-charcoal-stable.rstheme`: uses the new classes for the affected surfaces instead of compiled class names and first/last-child selectors.
+- Baseline: [rstudio/rstudio @ 9c11fb25c2a24c4faa09f79befb1907dc8a825de](https://github.com/rstudio/rstudio/tree/9c11fb25c2a24c4faa09f79befb1907dc8a825de).
 
-新增接口：
+| Public class | Surface |
+| :--- | :--- |
+| `rstheme_primaryWindowFrameHeader` | PrimaryWindowFrame title strip, including Console without tabs |
+| `rstheme_toolbar` | The table containing a toolbar's controls |
+| `rstheme_windowFrameHeader` | WindowFrame layout container around the header |
+| `rstheme_windowFrameContent` | WindowFrame layout container around main or full-size content |
 
-| 公开类 | 对应位置 |
-| --- | --- |
-| `rstheme_primaryWindowFrameHeader` | PrimaryWindowFrame 标题条，包括不显示标签时的 Console 标题条 |
-| `rstheme_toolbar` | Toolbar 内部承载控件的表格 |
-| `rstheme_windowFrameHeader` | WindowFrame 中包裹标题控件的布局容器 |
-| `rstheme_windowFrameContent` | WindowFrame 中包裹主内容或全尺寸内容的布局容器 |
+Existing classes remain. The Java changes add names without changing layout, controls, events, or default colors. Recreated content and headers receive the same classes. The names are also declared as CssResource `@external` selectors.
 
-原样式类保留。Java 只增加类名，不改变布局、控件、事件或默认颜色。内容与标题重新创建时，对应容器也获得类名；别名列入 CssResource 的 `@external` 声明。
+Other RStudio/Ace/GWT selectors may still depend on version. The OS title bar and Assistant iframe are outside this patch's scope.
 
-其他 RStudio/Ace/GWT 样式类仍可能有版本依赖。系统标题栏和 Assistant iframe 不在范围内。
+## Apply and verify
 
-## 应用与验证
-
-先下载本仓库，记下补丁的绝对路径。在上述基准提交的干净 RStudio 源码检出目录执行，`<community-repo>` 替换为本仓库路径：
+Download this community repository and note the patch's absolute path. From a clean RStudio source checkout at the baseline commit, replace `<community-repo>` below with that path:
 
 ```powershell
 git apply --check '<community-repo>/theme-support/rstudio-theme-hooks.patch'
 git apply '<community-repo>/theme-support/rstudio-theme-hooks.patch'
 ```
 
-按该提交的 [贡献指南](https://github.com/rstudio/rstudio/blob/9c11fb25c2a24c4faa09f79befb1907dc8a825de/CONTRIBUTING.md) 完成开发构建，再在 `e2e/rstudio` 运行：
+Complete a development build following the baseline's [contribution guide](https://github.com/rstudio/rstudio/blob/9c11fb25c2a24c4faa09f79befb1907dc8a825de/CONTRIBUTING.md). Then run from `e2e/rstudio`:
 
 ```powershell
 npm ci
@@ -41,11 +39,11 @@ npx playwright test tests/panes/theme_hooks.test.ts --project=desktop --no-deps 
 npm run test:desktop -- tests/panes/theme_hooks.test.ts --workers=1
 ```
 
-具体环境配置和运行命令以基准提交的 `e2e/rstudio/README.md` 为准。Desktop 测试必须指向带此修改的构建。测试发现 `--list`、TypeScript 检查和 CSS 解析均不能替代真正的 IDE 端到端运行。不要手工向 DOM 添加类来制造通过结果。
+Follow the baseline's `e2e/rstudio/README.md` for environment setup and commands. Desktop tests must target the patched build. Test discovery (`--list`), TypeScript checks, and CSS parsing do not replace a live IDE run. Do not add classes to the test DOM manually to manufacture a pass.
 
-测试检查公开类存在、深浅主题颜色改变、几何不变和移除 CSS 后恢复；应在未打补丁版本上因缺少接口而失败。
+The test checks hook presence, color changes under light and dark themes, unchanged geometry, and restoration after CSS removal. It should fail on an unpatched build because the hooks are absent.
 
-带补丁构建验证通过后，再通过 Appearance 的 Add… 添加本目录示例，或在本社区仓库根目录的 RStudio 中运行：
+After the patched build passes verification, install the example through Appearance > Add…, or run this in RStudio from the community repository root:
 
 ```r
 rstudioapi::addTheme(
@@ -54,12 +52,12 @@ rstudioapi::addTheme(
 )
 ```
 
-默认不覆盖同名主题。切回 Claude Terminal Charcoal 即可恢复普通版配色。
+Existing themes are not overwritten by default. Switch back to Claude Terminal Charcoal to restore the normal theme.
 
-## 状态与上游范围
+## Verification status and upstream scope
 
-2026-10-16 发布整理时，从基准提交下载原文件，实际完成 `git apply --check`、应用、反向检查及反向应用，均退出 0，原文件字节恢复一致。该检查不包含构建、TypeScript 检查或 IDE 端到端运行。
+On 2026-10-16, the original files were downloaded from the pinned baseline. `git apply --check`, application, reverse checking, and reverse application all exited 0. The original file bytes were restored exactly. This verification did not include a build, TypeScript checks, or an IDE end-to-end run.
 
-补丁仅用于补齐具体主题定位接口；与 [主题文档讨论 #6239](https://github.com/rstudio/rstudio/issues/6239) 相关，不承诺解决该讨论中的所有主题问题。本仓库发布不等于已向 RStudio 创建 PR，也不等于上游接受该改动。贡献协议、构建和完整运行验证仍需按上游要求完成。
+The proposal adds specific theme hooks and relates to [theme documentation discussion #6239](https://github.com/rstudio/rstudio/issues/6239); it does not resolve every issue in that discussion. Publishing this repository does not create an upstream PR or imply upstream acceptance. Contribution agreements, build requirements, and complete runtime verification still follow upstream policy.
 
-示例主题基于 RStudio Tomorrow Night Bright，沿用 AGPL-3.0；不是 Anthropic 官方主题。
+The example derives from RStudio's Tomorrow Night Bright and retains AGPL v3. It is not an official Anthropic theme.
